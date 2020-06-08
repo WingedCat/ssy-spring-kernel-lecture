@@ -40,6 +40,20 @@ import java.util.Set;
  *      11、BeanDefinitionHolder对象主要包含两部分内容：beanName和BeanDefinition;
  *      12、工厂会将解析出来的Bean信息存放到内部的一个ConcurrentHashMap中，该Map对象的键是beanName，值是BeanDefinition对象；
  *      13、调用Bean解析完毕的触发动作，从而触发相应的监听器的方法的执行（观察者模式）。
+ *
+ *   Spring 的创建流程：
+ *      1、Spring所管理的Bean实际上是缓存在一个ConcurrentHashMap中的（singletonObjects对象中）；
+ *      2、该对象本质上是一个key-value对的形式，key指的是bean的名字（id），value是一个Object对象，就是所创建的bean对象；
+ *      3、在创建bean之前，首先需要将该Bean的创建标识指定好，表示该bean已经或是即将被创建，目的是增强缓存的效率；
+ *      4、根据bean的scope属性来确定当前这个bean是一个singleton还是一个prototype的bean，然后创建相应的对象；
+ *      5、无论是singleton还是prototype的bean，其创建过程是一致的；
+ *      6、通过Java反射机制来创建Bean的实例，在创建之前需检查构造方法的访问修饰符，如果不是public的，则会调用setAccessible(true)
+ *          方法来突破Java的语法限制，使得可以通过非public构造方法来完成对象实例的创建
+ *      7、当对象创建完毕后，开始进行对象属性的注入；
+ *      8、在对象属性注入的过程中，Spring除去使用之前通过BeanDefinition对象获取的Bean信息外，还会通过反射的方式获取到上面所创建的Bean
+ *         中的真实属性信息（还包括一个class属性，表示该Bean所对应的Class类型）
+ *      9、完成Bean属性的注入（或抛出异常）
+ *      10、如果Bean是一个单例的，那么将所创建出来的Bean添加到singletonObjects对象中（缓存中）,供程序后续再次使用。
  */
 public class SpringClient {
     public static void main(String[] args) {
